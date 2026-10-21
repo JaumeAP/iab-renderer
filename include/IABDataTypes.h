@@ -540,7 +540,7 @@ namespace ImmersiveAudioBitstream
             
             x_ = static_cast<float>((iX - 32767)/32768.0f);		// Convert iX using defined relative distance coding
             y_ = static_cast<float>((iY - 32767)/32768.0f);		// Convert iY using defined relative distance coding
-            z_ = static_cast<float>(iZ/65536.0f);               // Convert iZ using defined relative distance coding
+            z_ = static_cast<float>(iZ/65535.0f);               // Convert iZ using defined relative distance coding
             
             return kIABNoError;
         }
