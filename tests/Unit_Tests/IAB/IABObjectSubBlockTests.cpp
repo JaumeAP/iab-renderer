@@ -159,7 +159,14 @@ namespace
             EXPECT_EQ(objectPositionUC.getStreamPosX(), 65535);
             EXPECT_EQ(objectPositionUC.getStreamPosY(), 65535);
             EXPECT_EQ(objectPositionUC.getStreamPosZ(), 65535);
-            
+
+            // Decoding stream values: z is coded with 65535 steps, so code 65535 is the ceiling, z = 1.0f
+            EXPECT_EQ(objectPositionUC.setIABObjectPosition(static_cast<uint16_t>(65535), static_cast<uint16_t>(65535), static_cast<uint16_t>(65535)), kIABNoError);
+            objectPositionUC.getIABObjectPosition(posX, posY, posZ);
+            EXPECT_EQ(posX, 1.0f);
+            EXPECT_EQ(posY, 1.0f);
+            EXPECT_EQ(posZ, 1.0f);
+
             // Test object snap
             IABObjectSnap objectSnap;
             objectSubBlockInterface->GetObjectSnap(objectSnap);
