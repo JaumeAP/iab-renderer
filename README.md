@@ -17,6 +17,13 @@ conventions. The build system can generate an HTML rendering.
 The [unit tests](./tests) and the [render-to-files application](./src/apps/)
 illustrate the use of the library.
 
+# Objects (this fork)
+
+[objects/](./objects) is not part of IABLib: it is object pan, movement and automation code on top of IABLib
+(`PanEvent`, `ObjectTrack`, the pan reader and writer, the pan profiles, ADM-style block sampling), shared by
+New-Renderer and Cinema-MXF, which add it with `add_subdirectory` after IABLib. Nothing in IABLib depends on it.
+State in [objects/docs/state.md](./objects/docs/state.md).
+
 # Dependencies
 
 The library has no runtime dependencies.
