@@ -97,6 +97,13 @@ namespace ImmersiveAudioBitstream
         numSamplePerRendererOutputChannel_ = 0;     // This is likely one subblock long and will depend on the bitstream frame rate, will be updated later
 		parentMetaID_ = 0;
         vbapObject_ = NULL;
+        // SetUp returns before creating these when the configuration has no speaker; the destructor deletes them
+        vbapRenderer_ = NULL;
+        channelGainsProcessor_ = NULL;
+        iabDecorrelation_ = NULL;
+        vectDSP_ = NULL;
+        outputBufferPointers_ = NULL;
+        iabObjectZone9_ = NULL;
         sampleBufferInt_ = NULL;
         sampleBufferFloat_ = NULL;
 		render96kTo48k_ = true;						// Default to true for SDK v1.x
@@ -122,6 +129,12 @@ namespace ImmersiveAudioBitstream
 		numSamplePerRendererOutputChannel_ = 0;     // This is likely one subblock long and will depend on the bitstream frame rate, will be updated later
 		parentMetaID_ = 0;
 		vbapObject_ = NULL;
+		// SetUp returns before creating these when the configuration has no speaker; the destructor deletes them
+		vbapRenderer_ = NULL;
+		channelGainsProcessor_ = NULL;
+		iabDecorrelation_ = NULL;
+		vectDSP_ = NULL;
+		outputBufferPointers_ = NULL;
         iabObjectZone9_ = NULL;
 		sampleBufferInt_ = NULL;
 		sampleBufferFloat_ = NULL;
@@ -2177,6 +2190,24 @@ namespace ImmersiveAudioBitstream
         
         for (iterFSE = frameSubElements.begin(); iterFSE != frameSubElements.end(); iterFSE++)
         {
+            // Float audio data (not in ST 2098-2): the samples as they are
+            IABAudioDataFloat *floatElement = dynamic_cast<IABAudioDataFloat*>(*iterFSE);
+            if (floatElement)
+            {
+                floatElement->GetAudioDataID(audioDataID);
+                if (audioDataID == iAudioDataID)
+                {
+                    if (floatElement->GetSampleCount() != numSamplePerRendererOutputChannel_)
+                    {
+                        return kIABRendererSampleCountMismatchError;
+                    }
+                    memcpy(iOutputSampleBuffer, floatElement->GetSamples(), numSamplePerRendererOutputChannel_ * sizeof(IABSampleType));
+                    sampleUpdated = true;
+                    break;
+                }
+                continue;
+            }
+
             // Check iAudioDataID against IABAudioDataDLC element
             dlcElement = dynamic_cast<IABAudioDataDLC*>(*iterFSE);
             if (dlcElement)

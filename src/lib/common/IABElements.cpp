@@ -829,7 +829,8 @@ namespace ImmersiveAudioBitstream
                  (kIABElementID_AuthoringToolInfo != elementID) &&
                  (kIABElementID_UserData != elementID) &&
                  (kIABElementID_AudioDataDLC != elementID) &&
-                 (kIABElementID_AudioDataPCM != elementID))
+                 (kIABElementID_AudioDataPCM != elementID) &&
+                 (kIABElementID_AudioDataFloat != elementID))
             {
                 return kIABBadArgumentsError;
             }
@@ -1427,7 +1428,8 @@ namespace ImmersiveAudioBitstream
 			(kIABElementID_AuthoringToolInfo != elementID) &&
 			(kIABElementID_UserData != elementID) &&
 			(kIABElementID_AudioDataDLC != elementID) &&
-			(kIABElementID_AudioDataPCM != elementID))
+			(kIABElementID_AudioDataPCM != elementID) &&
+			(kIABElementID_AudioDataFloat != elementID))
 		{
 			return errorCode;
 		}
@@ -9112,6 +9114,58 @@ namespace ImmersiveAudioBitstream
         // #################################################
 
 		return isToContinue;
+	}
+
+	// IABAudioDataFloat (not in ST 2098-2)
+
+	IABAudioDataFloat::IABAudioDataFloat(uint32_t iSampleCount) : IABElement(kIABElementID_AudioDataFloat)
+	{
+		audioDataID_ = 0;
+		sampleCount_ = iSampleCount;
+		samples_ = new float[sampleCount_];
+		memset(samples_, 0, sampleCount_ * sizeof(float));
+	}
+
+	IABAudioDataFloat::~IABAudioDataFloat()
+	{
+		delete[] samples_;
+	}
+
+	void IABAudioDataFloat::GetAudioDataID(IABAudioDataIDType &oAudioDataID) const
+	{
+		oAudioDataID = audioDataID_;
+	}
+
+	iabError IABAudioDataFloat::SetAudioDataID(IABAudioDataIDType iAudioDataID)
+	{
+		audioDataID_ = iAudioDataID;
+		return kIABNoError;
+	}
+
+	uint32_t IABAudioDataFloat::GetSampleCount() const
+	{
+		return sampleCount_;
+	}
+
+	iabError IABAudioDataFloat::SetSamples(const float* iSamples, uint32_t iSampleCount)
+	{
+		if (iSamples == nullptr)
+		{
+			return kIABBadArgumentsError;
+		}
+
+		if (iSampleCount != sampleCount_)
+		{
+			return kIABArgumentIncorrectPCMSampleCount;
+		}
+
+		memcpy(samples_, iSamples, sampleCount_ * sizeof(float));
+		return kIABNoError;
+	}
+
+	const float* IABAudioDataFloat::GetSamples() const
+	{
+		return samples_;
 	}
 
 } // namespace ImmersiveAudioBitstream
