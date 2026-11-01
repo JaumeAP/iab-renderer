@@ -1653,6 +1653,43 @@ namespace ImmersiveAudioBitstream
 		int32_t* unpackedPCM_;
 	};
 
+	/**
+	 * Not in ST 2098-2: the float samples of one channel (1.0 is full scale, no clip) for a frame built and rendered in
+	 * the same process. The renderers take them as they are; the bitstream has no such element, so it is never
+	 * serialised (Serialize returns kIABNotImplementedError, as IABElement's does).
+	 */
+	class IABAudioDataFloat : public virtual IABElement
+	{
+	public:
+
+		// Constructor: a buffer of iSampleCount samples, silent until SetSamples
+		explicit IABAudioDataFloat(uint32_t iSampleCount);
+
+		// Destructor
+		~IABAudioDataFloat();
+
+		// Get audio data ID
+		void GetAudioDataID(IABAudioDataIDType &oAudioDataID) const;
+
+		// Set audio data ID
+		iabError SetAudioDataID(IABAudioDataIDType iAudioDataID);
+
+		// Get sample count
+		uint32_t GetSampleCount() const;
+
+		// Copy iSampleCount samples in; iSampleCount must be GetSampleCount()
+		iabError SetSamples(const float* iSamples, uint32_t iSampleCount);
+
+		// The samples
+		const float* GetSamples() const;
+
+	private:
+
+		IABAudioDataIDType audioDataID_;
+		uint32_t sampleCount_;
+		float* samples_;
+	};
+
 } // namespace ImmersiveAudioBitstream
 } // namespace SMPTE
 

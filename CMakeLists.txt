@@ -15,6 +15,10 @@ endif()
 
 add_library(${PROJECT_NAME} ${LIB_SRC_FILES})
 
+# The multi-threaded renderer (IABRendererMTInterface, enabled by IABDataTypes.h on Linux and macOS), on POSIX threads
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} Threads::Threads)
+
 if(APPLE)
   find_library(ACCEL_UNIT Accelerate)
   if (NOT ACCEL_UNIT)

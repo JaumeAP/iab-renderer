@@ -403,6 +403,11 @@ namespace ImmersiveAudioBitstream
 		assetSampleBuffer_ = NULL;
 		assetSampleBufferPointers_ = NULL;
 
+		// SetUp returns before creating these, and the threads, when the configuration has no speaker; the
+		// destructor deletes them
+		iabDecorrelation_ = NULL;
+		vectDSP_ = NULL;
+
 		objectRenderersAreInited_ = false;
 		bedRenderersAreInited_ = false;
 		assetDecodersAreInited_ = false;
@@ -439,7 +444,8 @@ namespace ImmersiveAudioBitstream
 		jobQueueHasEntries.broadcast();
 		jobQueueMutex.unlock();
 
-		for (uint32_t i = 0; i < threadPoolSize_; i++)
+		// threads_ is empty when SetUp created no thread
+		for (uint32_t i = 0; i < threads_.size(); i++)
 		{
 			void* status;
 			if (0 != pthread_join(threads_[i], &status))
@@ -1090,6 +1096,23 @@ namespace ImmersiveAudioBitstream
 				// Set up PCM params
 				jobParameterCarrier_.assetDecodeParam_.iIABAudioPCM_ = (dynamic_cast<IABAudioDataPCM*>(frameSubElements[i]));	// PCM to unpack
 				jobParameterCarrier_.assetDecodeParam_.iIABAudioPCM_->GetAudioDataID(elementAudioDataID);
+			}
+			else if (kIABElementID_AudioDataFloat == elementID)
+			{
+				// Float audio data (not in ST 2098-2): nothing to decode, the renderers read its samples where they are
+				IABAudioDataFloat *floatElement = dynamic_cast<IABAudioDataFloat*>(frameSubElements[i]);
+				IABAudioDataIDType floatAudioDataID = 0;
+				floatElement->GetAudioDataID(floatAudioDataID);
+				if (floatAudioDataID != 0)
+				{
+					if (floatElement->GetSampleCount() != frameSampleCount_)
+					{
+						jobQueueMutex.unlock();
+						return kIABRendererSampleCountMismatchError;
+					}
+					frameAudioDataIDToAssetPointerMap_.insert(std::pair<IABAudioDataIDType, IABSampleType*>(floatAudioDataID,
+						const_cast<IABSampleType*>(floatElement->GetSamples())));
+				}
 			}
 			else;		// Not adding any other elements to queues at this stage. Ensure asset are completely decoded.
 

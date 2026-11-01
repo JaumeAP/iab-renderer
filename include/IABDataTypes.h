@@ -234,7 +234,8 @@ namespace ImmersiveAudioBitstream
 		kIABElementID_AuthoringToolInfo     = 0x100,			/**< Identifies "Authoring Tool Information" element */
 		kIABElementID_UserData              = 0x101,			/**< Identifies "User defined data" element */
 		kIABElementID_AudioDataDLC			= 0x200,			/**< Identifies "Audio Data (DLC encoded)" element */
-        kIABElementID_AudioDataPCM			= 0x400				/**< Identifies "Audio Data PCM" element */
+        kIABElementID_AudioDataPCM			= 0x400,			/**< Identifies "Audio Data PCM" element */
+        kIABElementID_AudioDataFloat		= 0x800				/**< Not in ST 2098-2: float audio data of a frame built and rendered in one process, never serialised (IABAudioDataFloat) */
     };
 
     /**
