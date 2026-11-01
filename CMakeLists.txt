@@ -50,7 +50,4 @@ endif()
 
 # tests
 
-option(IAB_BUILD_TESTS "Build the tests (downloads googletest)" ON)
-if(IAB_BUILD_TESTS)
-  add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
